@@ -164,4 +164,4 @@ restart-gateway:
 # Bootstrap dashboard
 .PHONY: bootstrap-oss
 bootstrap-oss:
-	$(shell ./tyk/scripts/bootstrap-oss.sh)
+	@./tyk/scripts/bootstrap-oss.sh

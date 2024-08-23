@@ -4,7 +4,6 @@ sleep 1;
 status=$(curl -s -o /dev/null -w "%{http_code}" localhost:8080/hello)
 
 if [ "302" == "$status" ] || [ "200" == "$status" ]; then
-
   # Create httpbin API
   curl -s -X POST localhost:8080/tyk/apis \
     --header "X-Tyk-Authorization: 352d20ee67be67f6340b4c0605b044b7" \
@@ -477,7 +476,12 @@ if [ "302" == "$status" ] || [ "200" == "$status" ]; then
     }" > /dev/null
 
    # Create httpbin API
-  curl -s localhost:8080/tyk/reload \
-    --header "X-Tyk-Authorization: 352d20ee67be67f6340b4c0605b044b7" > /dev/null
+  curl -X POST localhost:8080/tyk/apis/oas \
+    --header "X-Tyk-Authorization: 352d20ee67be67f6340b4c0605b044b7" \
+    --header "Content-Type: application/json" \
+    --data "@tyk/scripts/oas.json"
+
+  curl -X GET localhost:8080/tyk/reload \
+    --header "X-Tyk-Authorization: 352d20ee67be67f6340b4c0605b044b7"
 
 fi

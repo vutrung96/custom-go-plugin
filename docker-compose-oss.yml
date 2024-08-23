@@ -1,18 +1,20 @@
-version: '3.8'
+version: "3.8"
 services:
-
   tyk-plugin-compiler:
-    image: tykio/tyk-plugin-compiler:${TYK_VERSION:-v5.2.4}
+    image: tykio/tyk-plugin-compiler:${TYK_VERSION:-v5.5.0}
     volumes:
       - ./go/src:/plugin-source
 
   tyk-gateway:
-    image: tykio/tyk-gateway:${TYK_VERSION:-v5.2.4-amd64}
+    image: tykio/tyk-gateway:${TYK_VERSION:-v5.5.0-amd64}
+    depends_on:
+      - tyk-redis
     ports:
       - "8080:8080"
     volumes:
       - ./tyk/bundle:/opt/tyk-gateway/bundle
       - ./tyk/middleware:/opt/tyk-gateway/middleware
+      - ./tyk/apps:/opt/tyk-gateway/apps
     env_file:
       - ./tyk/confs/tyk-oss.env
     networks:
