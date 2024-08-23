@@ -37,53 +37,39 @@
       "middleware": {
         "global": {
           "pluginConfig": {
-            "data": {
-              "enabled": true,
-              "value": {
-                "env-config-example": "env://SOME_CONFIG_DATA"
-              }
-            },
             "driver": "goplugin"
           },
-          "postAuthenticationPlugins": [
-            {
-              "enabled": true,
-              "functionName": "InjectConfigData",
-              "path": "/opt/tyk-gateway/middleware/CustomGoPlugin.so"
-            }
-          ],
-          "postPlugins": [
-            {
-              "enabled": true,
-              "functionName": "InjectMetadata",
-              "path": "/opt/tyk-gateway/middleware/CustomGoPlugin.so"
-            }
-          ],
           "prePlugins": [
             {
               "enabled": true,
-              "functionName": "AddFooBarHeader",
+              "functionName": "ParseApiKeyIntoTykFormat",
               "path": "/opt/tyk-gateway/middleware/CustomGoPlugin.so"
             }
-          ]
+          ],
+          "transformRequestHeaders": {
+            "enabled": true,
+            "remove": [
+                "Authorization"
+            ]
         }
-      },
-      "server": {
-        "authentication": {
-          "enabled": true,
-          "securitySchemes": {
-            "authToken": {
-              "enabled": true
-            }
-          }
-        },
-        "listenPath": {
-          "strip": true,
-          "value": "/json/"
-        }
-      },
-      "upstream": {
-        "url": "http://httpbin.org/"
       }
-    }
+    },
+    "server": {
+      "authentication": {
+        "enabled": true,
+        "securitySchemes": {
+          "authToken": {
+            "enabled": true
+          }
+        }
+      },
+      "listenPath": {
+        "strip": true,
+        "value": "/json/"
+      }
+    },
+    "upstream": {
+      "url": "http://httpbin.org/"
+    } 
   }
+}

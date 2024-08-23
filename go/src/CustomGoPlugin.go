@@ -1,21 +1,21 @@
 package main
 
 import (
-	"io/ioutil"
 	"net/http"
 
 	"github.com/TykTechnologies/opentelemetry/trace"
-	"github.com/TykTechnologies/tyk/apidef/oas"
-	"github.com/TykTechnologies/tyk/ctx"
+
+	"encoding/base64"
+	"fmt"
+	"os"
 
 	"github.com/TykTechnologies/tyk/log"
-	"github.com/TykTechnologies/tyk/user"
 )
 
 var logger = log.Get()
 
-// Parse incoming API key
-func AddFooBarHeader(rw http.ResponseWriter, r *http.Request) {
+// Parse incoming api_key header into Tyk's expected format
+func ParseApiKeyIntoTykFormat(rw http.ResponseWriter, r *http.Request) {
 	// We create a new span using the context from the incoming request.
 	_, newSpan := trace.NewSpanFromContext(r.Context(), "", "GoPlugin_first-span")
 
@@ -26,14 +26,18 @@ func AddFooBarHeader(rw http.ResponseWriter, r *http.Request) {
 	newSpan.SetName("AddFooBarHeader Function")
 
 	// Set the status of the span.
-	newSpan.SetStatus(trace.StatusOK, "")
+	newSpan.SetStatus(trace.SPAN_STATUS_OK, "")
 
 	// Get the api_key header
 	keyID := r.Header.Get("api_key")
 
-	// Define the org and hash algorithm
+	// Define the org and get hash algorithm from environment variable
 	orgID := "" // Empty string as per your example
-	hashAlgorithm := "murmur128"
+	hashAlgorithm := os.Getenv("TYK_GW_HASHKEYFUNCTION")
+	if hashAlgorithm == "" {
+		logger.Warn("Hash algorithm is empty, defaulting to murmur128.")
+		hashAlgorithm = "murmur128" // Default value if environment variable is not set
+	}
 
 	// Create the JSON token string with the precise format
 	jsonToken := fmt.Sprintf(`{"org":"%s","id":"%s","h":"%s"}`, orgID, keyID, hashAlgorithm)
